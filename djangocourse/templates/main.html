@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Django Course</title>
+</head>
+<body>
+    <div id="navbar">
+        {% include 'navbar.html' %}
+    </div>
+
+    <div id="content">
+        {% block content %}
+        {% endblock content %}
+    </div>
+
+    <div id="footer">
+        <h2> FOOTER </h2>
+    </div>
+
+</body>
+</html>
