@@ -1,12 +1,22 @@
 {% extends 'main.html' %}
 
 {% block content %}
-<h1> Projects Template </h1>
-<ul>
+<h1> Projects </h1>
+<table>
+    <tr>
+        <th> Tite </th>
+        <th> Votes </th>
+        <th> Ratio </th>
+        <th> Created </th>
+    </tr>
     {% for project in projects%}
-        <li>
-            <b> Name: </b> <a href="{% url 'project' project.id %}"> {{project.title}} </a> --- {{project.description}}
-        </li>
+        <tr>
+            <td> {{project.title}} </td>
+            <td> {{ project.vote_total }} </td>
+            <td> {{ project.vote_ratio }}% </td>
+            <td> {{ project.created }} </td>
+            <td> <a href="{% url 'project' project.id %}"> View </a></td>
+        </tr>
     {% endfor %}
-</ul>
+</table>
 {% endblock content %}
