@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from .models import Project
 from .forms import ProjectForm
 
@@ -28,6 +28,48 @@ def project(request, pk):
 
 
 def create_project(request):
-    form = ProjectForm()
-    context = {'form': form}
-    return render(request, 'projects/project_form.html', context)
+    if request.method == 'GET':
+        form = ProjectForm()
+        context = {'form': form}
+        return render(request, 'projects/project_form.html', context)
+
+    form = ProjectForm(request.POST)
+    if form.is_valid():
+        form.save()
+        return redirect('projects')
+
+
+def update_project(request, pk):
+    try:
+        project = Project.objects.get(id=pk)
+    except Exception:
+        return render(
+            request, 'projects/no_project.html', {'project': {'pk': pk}},
+        )
+
+    if request.method == 'GET':
+        form = ProjectForm(instance=project)
+        context = {'form': form}
+        return render(request, 'projects/project_form.html', context)
+
+    form = ProjectForm(request.POST, instance=project)
+    if form.is_valid():
+        form.save()
+        return redirect('projects')
+
+
+def delete_project(request, pk):
+    try:
+        project = Project.objects.get(id=pk)
+    except Exception:
+        return render(
+            request, 'projects/no_project.html', {'project': {'pk': pk}},
+        )
+
+    if request.method == 'GET':
+        return render(
+            request, 'projects/delete_object.html', {'object': project},
+        )
+
+    project.delete()
+    return redirect('projects')

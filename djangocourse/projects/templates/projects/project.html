@@ -10,4 +10,7 @@
 <hr>
 <br>
 <p> {{project.description}} </p>
+
+<a href="{% url 'update-project' project.id %}"> Edit </a>
+
 {% endblock content %}
