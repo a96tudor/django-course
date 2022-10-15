@@ -75,6 +75,7 @@
           <div class="devInfo">
             <h3 class="devInfo__title">Projects</h3>
             <div class="grid grid--two">
+
               {% for project in profile.project_set.all %}
               <div class="column">
                 <div class="card project">
@@ -85,7 +86,7 @@
                       <p><a class="project__author" href="profile.html">{{project.owner}}</a></p>
                       <p class="project--rating">
                         <span style="font-weight: bold;">{{project.vote_ratio}}%</span> Postitive
-                        Feedback ({{project.vote_total}} Votes)
+                        Feedback ({{project.vote_total}} Vote{{project.vote_total|pluralize:'s'}})
                       </p>
                       <div class="project__tags">
                         {% for tag in project.tags.all %}
@@ -98,8 +99,9 @@
                   </a>
                 </div>
               </div>
-            </div>
+
             {% endfor %}
+</div>
           </div>
         </div>
       </div>
