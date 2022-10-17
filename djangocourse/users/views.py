@@ -85,3 +85,16 @@ def register_user(request):
     else:
         messages.error(request, 'Data validation failed!')
         return redirect('register')
+
+
+def user_account(request):
+    user = request.user.userprofile
+
+    return render(
+        request, 'users/account.html',
+        {
+            'profile': user,
+            'skills': user.skill_set.all(),
+            'projects': user.project_set.all(),
+        },
+    )
