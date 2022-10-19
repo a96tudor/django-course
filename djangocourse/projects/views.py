@@ -20,7 +20,7 @@ def project(request, pk):
         project = Project.objects.get(id=pk)
     except Exception:
         return render(
-            request, 'projects/no_project.html', {'project': {'pk': pk}},
+            request, 'projects/no_skill.html', {'project': {'pk': pk}},
         )
 
     tags = project.tags.all()
@@ -55,7 +55,7 @@ def update_project(request, pk):
         project = profile.project_set.get(id=pk)
     except Exception:
         return render(
-            request, 'projects/no_project.html', {'project': {'pk': pk}},
+            request, 'projects/no_skill.html', {'project': {'pk': pk}},
         )
 
     if request.method == 'GET':
@@ -76,12 +76,12 @@ def delete_project(request, pk):
         project = profile.project_set.get(id=pk)
     except Exception:
         return render(
-            request, 'projects/no_project.html', {'project': {'pk': pk}},
+            request, 'projects/no_skill.html', {'project': {'pk': pk}},
         )
 
     if request.method == 'GET':
         return render(
-            request, 'projects/delete_object.html', {'object': project},
+            request, 'projects/delete_skill.html', {'object': project},
         )
 
     project.delete()

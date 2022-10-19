@@ -4,7 +4,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .forms import UserRegistrationForm, ProfileForm
+from .forms import UserRegistrationForm, ProfileForm, SkillForm
 from .models import UserProfile
 
 # Create your views here.
@@ -115,3 +115,73 @@ def edit_account(request):
     if form.is_valid():
         form.save()
         return redirect('user_account')
+    else:
+        messages.error(request, 'Data validation failed!')
+        return redirect('edit-account')
+
+
+@login_required(login_url='login')
+def create_skill(request):
+    profile = request.user.userprofile
+
+    if request.method == 'GET':
+        form = SkillForm()
+
+        return render(
+            request, 'users/skill_form.html', {'form': form},
+        )
+
+    form = SkillForm(request.POST)
+
+    if form.is_valid():
+        skill = form.save(commit=False)
+        skill.owner = profile
+        skill.save()
+        return redirect('user_account')
+    else:
+        messages.error(request, 'Data validation failed!')
+        return redirect('create-skill')
+
+
+@login_required(login_url='login')
+def update_skill(request, pk):
+    try:
+        profile = request.user.userprofile
+        skill = profile.skill_set.get(id=pk)
+    except Exception:
+        return render(
+            request, 'users/no_skill.html', {'id': pk},
+        )
+
+    if request.method == 'GET':
+        form = SkillForm(instance=skill)
+
+        return render(request, 'users/skill_form.html', {'form': form})
+
+    form = SkillForm(request.POST, instance=skill)
+
+    if form.is_valid():
+        form.save()
+
+        return redirect('user_account')
+    else:
+        messages.error(request, 'Data validation failed!')
+        return redirect('update-skill', pk=pk)
+
+
+@login_required(login_url='login')
+def delete_skill(request, pk):
+    try:
+        profile = request.user.userprofile
+        skill = profile.skill_set.get(id=pk)
+    except Exception:
+        return render(
+            request, 'users/no_skill.html', {'id': pk},
+        )
+
+    if request.method == 'GET':
+        return render(request, 'users/delete_skill.html', {'object': skill})
+
+    skill.delete()
+    return redirect('user_account')
+
