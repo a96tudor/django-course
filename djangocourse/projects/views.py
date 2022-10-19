@@ -32,6 +32,7 @@ def project(request, pk):
 
 @login_required(login_url='login')
 def create_project(request):
+    profile = request.user.userprofile
     if request.method == 'GET':
         form = ProjectForm()
         context = {'form': form}
@@ -39,14 +40,19 @@ def create_project(request):
 
     form = ProjectForm(request.POST, request.FILES)
     if form.is_valid():
-        form.save()
+        project = form.save(commit=False)
+        project.owner = profile
+
+        project.save()
+
         return redirect('projects')
 
 
 @login_required(login_url='login')
 def update_project(request, pk):
     try:
-        project = Project.objects.get(id=pk)
+        profile = request.user.userprofile
+        project = profile.project_set.get(id=pk)
     except Exception:
         return render(
             request, 'projects/no_project.html', {'project': {'pk': pk}},
@@ -66,7 +72,8 @@ def update_project(request, pk):
 @login_required(login_url='login')
 def delete_project(request, pk):
     try:
-        project = Project.objects.get(id=pk)
+        profile = request.user.userprofile
+        project = profile.project_set.get(id=pk)
     except Exception:
         return render(
             request, 'projects/no_project.html', {'project': {'pk': pk}},
