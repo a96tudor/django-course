@@ -1,5 +1,7 @@
 {% extends 'main.html' %}
 
+{% load static %}
+
 {% block content %}
 
 <main class="settingsPage profile my-md">
@@ -8,8 +10,8 @@
         <div class="column column--1of3">
           <div class="card text-center">
             <div class="card__body dev">
-              <a class="tag tag--pill tag--main settings__btn" href="#"><i class="im im-edit"></i> Edit</a>
-              <img class="avatar avatar--xl dev__avatar" src="https://avatars.githubusercontent.com/u/33843378" />
+              <a class="tag tag--pill tag--main settings__btn" href="{% url 'edit-account'%}"><i class="im im-edit"></i> Edit</a>
+              <img class="avatar avatar--xl dev__avatar" src="{{profile.profile_image.url}}" />
               <h2 class="dev__name">{{user.short_intro}}</h2>
               <p class="dev__location">{{user.location}}</p>
                 <ul class="dev__social">

@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
-from .forms import UserRegistrationForm
+from .forms import UserRegistrationForm, ProfileForm
 from .models import UserProfile
 
 # Create your views here.
@@ -52,6 +53,7 @@ def login_page(request):
     return redirect('login')
 
 
+@login_required(login_url='login')
 def logout_user(request):
     logout(request)
     messages.info(request, 'User was logged out!')
@@ -80,13 +82,14 @@ def register_user(request):
 
         login(request, user)
 
-        return redirect('profiles')
+        return redirect('edit-account')
 
     else:
         messages.error(request, 'Data validation failed!')
         return redirect('register')
 
 
+@login_required(login_url='login')
 def user_account(request):
     user = request.user.userprofile
 
@@ -98,3 +101,17 @@ def user_account(request):
             'projects': user.project_set.all(),
         },
     )
+
+
+@login_required(login_url='login')
+def edit_account(request):
+    profile = request.user.userprofile
+    if request.method == 'GET':
+        form = ProfileForm(instance=profile)
+        return render(request, 'users/profile_form.html', {'form': form})
+
+    form = ProfileForm(request.POST, request.FILES, instance=profile)
+
+    if form.is_valid():
+        form.save()
+        return redirect('user_account')
