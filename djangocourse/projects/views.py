@@ -4,6 +4,7 @@ from django.contrib.auth.decorators import login_required
 from .models import Project
 from .forms import ProjectForm
 from .utils import search_projects
+from utils import get_paginator_for_dataset
 
 
 # Create your views here.
@@ -11,9 +12,16 @@ from .utils import search_projects
 
 def projects(request):
     projects, query = search_projects(request)
+    projects, paginator, custom_range = get_paginator_for_dataset(
+        projects, request, 3,
+    )
+
     return render(
         request, 'projects/projects.html',
-        {'projects': projects, 'query': query},
+        {
+            'projects': projects, 'query': query,
+            'custom_range': custom_range,
+        },
     )
 
 

@@ -7,16 +7,23 @@ from django.contrib.auth.decorators import login_required
 from .forms import UserRegistrationForm, ProfileForm, SkillForm
 from .models import UserProfile
 from .utils import search_profiles
+from utils import get_paginator_for_dataset
 
 # Create your views here.
 
 
 def profiles(request):
     profiles, query = search_profiles(request)
+    profiles, paginator, custom_range = get_paginator_for_dataset(
+        profiles, request, 3,
+    )
 
     return render(
         request, 'users/profiles.html',
-        {'profiles': profiles, 'query': query},
+        {
+            'profiles': profiles, 'query': query,
+            'custom_range': custom_range,
+        },
     )
 
 
