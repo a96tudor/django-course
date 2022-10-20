@@ -3,15 +3,17 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Project
 from .forms import ProjectForm
+from .utils import search_projects
 
 
 # Create your views here.
 
 
 def projects(request):
-    all_projects = Project.objects.all()
+    projects, query = search_projects(request)
     return render(
-        request, 'projects/projects.html', {'projects': all_projects}
+        request, 'projects/projects.html',
+        {'projects': projects, 'query': query},
     )
 
 

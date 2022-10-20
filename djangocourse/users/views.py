@@ -6,13 +6,18 @@ from django.contrib.auth.decorators import login_required
 
 from .forms import UserRegistrationForm, ProfileForm, SkillForm
 from .models import UserProfile
+from .utils import search_profiles
 
 # Create your views here.
 
 
 def profiles(request):
-    profiles = UserProfile.objects.all()
-    return render(request, 'users/profiles.html', {'profiles': profiles})
+    profiles, query = search_profiles(request)
+
+    return render(
+        request, 'users/profiles.html',
+        {'profiles': profiles, 'query': query},
+    )
 
 
 def user_profile(request, pk):
