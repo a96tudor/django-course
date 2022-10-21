@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 
 from .models import Project
-from .forms import ProjectForm
+from .forms import ProjectForm, ReviewForm
 from .utils import search_projects
 from utils import get_paginator_for_dataset
 
@@ -32,12 +32,29 @@ def project(request, pk):
         return render(
             request, 'projects/no_skill.html', {'project': {'pk': pk}},
         )
+    profile = request.user.userprofile
 
-    tags = project.tags.all()
+    if request.method == 'GET' or profile == project.owner:
+        tags = project.tags.all()
 
-    return render(
-        request, 'projects/project.html', {'project': project, 'tags': tags},
-    )
+        return render(
+            request, 'projects/project.html',
+            {
+                'project': project, 'form': ReviewForm(),
+                'tags': tags, 'profile': profile,
+            },
+        )
+
+    form = ReviewForm(request.POST)
+
+    if form.is_valid():
+        review = form.save(commit=False)
+        review.owner = profile
+        review.project = project
+
+        review.save()
+
+    return redirect('project', project.id)
 
 
 @login_required(login_url='login')
