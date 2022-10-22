@@ -4,7 +4,7 @@ from django.contrib import messages
 
 from .models import Project
 from .forms import ProjectForm, ReviewForm
-from .utils import search_projects, get_votes_for_project
+from .utils import search_projects
 from utils import get_paginator_for_dataset
 
 
