@@ -35,6 +35,10 @@ class Project(models.Model):
 
     class Meta:
         ordering = ['-vote_ratio', '-vote_total', '-created']
+    
+    @property
+    def reviewers(self):
+        return self.review_set.all().values_list('owner__id', flat=True)
 
     @property
     def get_vote_ratio(self):

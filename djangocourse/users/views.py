@@ -58,6 +58,8 @@ def login_page(request):
 
     if user is not None:
         login(request, user)
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
         return redirect('profiles')
     else:
         messages.error(request, 'Username or password is incorrect!')

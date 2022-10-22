@@ -33,26 +33,26 @@ def project(request, pk):
         return render(
             request, 'projects/no_skill.html', {'project': {'pk': pk}},
         )
-    profile = request.user.userprofile
-
-    already_voted = profile in [review.owner for review in
-        project.review_set.all()]
+    try:
+        profile = request.user.userprofile
+        already_voted = profile.id in project.reviewers
+    except AttributeError:
+        profile = None
+        already_voted = False
 
     if request.method == 'GET' or profile == project.owner:
-        upvote_perc, number_of_votes = get_votes_for_project(project)
         tags = project.tags.all()
 
         return render(
             request, 'projects/project.html',
             {
                 'project': project, 'form': ReviewForm(),
-                'tags': tags, 'profile': profile, 'votes': number_of_votes,
-                'upvote_perc': upvote_perc * 100,
+                'tags': tags, 'profile': profile,
                 'already_voted': already_voted,
             },
         )
 
-    if already_voted:
+    if already_voted or profile is None:
         return redirect('project', project.id)
 
     form = ReviewForm(request.POST)
