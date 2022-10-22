@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 
 from .models import Project
 from .forms import ProjectForm, ReviewForm
-from .utils import search_projects
+from .utils import search_projects, get_votes_for_project
 from utils import get_paginator_for_dataset
 
 
@@ -34,16 +34,25 @@ def project(request, pk):
         )
     profile = request.user.userprofile
 
+    already_voted = profile in [review.owner for review in
+        project.review_set.all()]
+
     if request.method == 'GET' or profile == project.owner:
+        upvote_perc, number_of_votes = get_votes_for_project(project)
         tags = project.tags.all()
 
         return render(
             request, 'projects/project.html',
             {
                 'project': project, 'form': ReviewForm(),
-                'tags': tags, 'profile': profile,
+                'tags': tags, 'profile': profile, 'votes': number_of_votes,
+                'upvote_perc': upvote_perc * 100,
+                'already_voted': already_voted,
             },
         )
+
+    if already_voted:
+        return redirect('project', project.id)
 
     form = ReviewForm(request.POST)
 

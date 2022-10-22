@@ -43,10 +43,10 @@
                 </div>
                 <div class="comments">
                     <h5 class="project--rating">
-                        {{project.vote_ratio}}% Positive Feedback ({{project.vote_total}}
+                        {{upvote_perc|floatformat:2}}% Positive Feedback ({{votes}}
                         Vote{{project.vote_total|pluralize:"s"}})
                     </h5>
-            {% if profile != project.owner %}
+            {% if profile != project.owner and not already_voted %}
             <form class="form" action="{% url 'project' project.id %}" method="POST">
                 {% csrf_token %}
                 {% for field in form %}
