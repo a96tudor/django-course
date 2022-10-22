@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 from .models import Project
 from .forms import ProjectForm, ReviewForm
@@ -62,6 +63,8 @@ def project(request, pk):
         review.project = project
 
         review.save()
+        project.get_vote_ratio
+        messages.success(request, 'Your review was submitted successfully!')
 
     return redirect('project', project.id)
 

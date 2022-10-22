@@ -34,7 +34,23 @@ class Project(models.Model):
         return f'{self.title}'
 
     class Meta:
-        ordering = ['-created']
+        ordering = ['-vote_ratio', '-vote_total', '-created']
+
+    @property
+    def get_vote_ratio(self):
+        all_reviews = self.review_set.all()
+
+        upvotes = all_reviews.filter(value='up').count()
+        total_votes = all_reviews.count()
+
+        self.vote_total = total_votes
+
+        if total_votes == 0:
+            self.vote_ratio = 0.0
+        else:
+            self.vote_ratio = upvotes / total_votes * 100
+
+        self.save()
 
 
 class Review(models.Model):
