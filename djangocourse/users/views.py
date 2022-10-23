@@ -4,8 +4,8 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 
-from .forms import UserRegistrationForm, ProfileForm, SkillForm
-from .models import UserProfile
+from .forms import UserRegistrationForm, ProfileForm, SkillForm, MessageForm
+from .models import UserProfile, Message
 from .utils import search_profiles
 from utils import get_paginator_for_dataset
 
@@ -199,3 +199,74 @@ def delete_skill(request, pk):
     skill.delete()
     return redirect('user_account')
 
+
+@login_required(login_url='login')
+def message(request, pk):
+    profile = request.user.userprofile
+    try:
+        message = profile.messages.get(id=pk)
+    except Exception:
+        messages.error(request, f'No message with id "{pk}"')
+        return redirect(request, 'inbox')
+
+    message.read = True
+    message.save()
+
+    return render(request, 'users/message.html', {'message': message})
+
+
+@login_required(login_url='login')
+def inbox(request):
+    profile = request.user.userprofile
+    user_messages = profile.messages.all()
+    new_messages_count = user_messages.filter(read=False).count()
+
+    return render(
+        request, 'users/inbox.html',
+        {'user_messages': user_messages, 'unread_count': new_messages_count}
+    )
+
+
+def send_message(request, pk):
+    try:
+        recipient = UserProfile.objects.get(id=pk)
+    except:
+        messages.error(request, f'No user with id "{pk}"')
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
+        else:
+            return redirect('profiles')
+
+    if request.method == 'GET':
+        form = MessageForm()
+
+        return render(
+            request, 'users/new_message.html',
+            {'form': form, 'recipient': recipient}
+        )
+
+    form = MessageForm(request.POST)
+
+    if form.is_valid():
+        message = form.save(commit=False)
+
+        try:
+            profile = request.user.userprofile
+            message.sender = profile
+            message.email = profile.email
+            message.name = profile.name
+        except:
+            pass
+
+        message.recipient = recipient
+        message.save()
+
+        messages.success(request, f'Message sent to {recipient}!')
+
+        if 'next' in request.GET:
+            return redirect(request.GET['next'])
+        else:
+            return redirect('profiles')
+
+    messages.error(request, 'Failed to send message!')
+    return redirect('send-message')
